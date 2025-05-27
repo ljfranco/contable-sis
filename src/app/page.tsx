@@ -12,7 +12,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import LoginForm from "./components/loginForm";
+import LoginForm from './components/LoginForm';
 import { useAuth } from './context/AuthContext';
 import { Spin } from 'antd'; // Para un spinner
 
