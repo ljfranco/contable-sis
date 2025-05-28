@@ -86,7 +86,6 @@ const ClientsTable: React.FC = () => {
                         .from('clients')
                         .delete()
                         .eq('id_client', clientId);
-
                     if (error) {
                         throw error;
                     }

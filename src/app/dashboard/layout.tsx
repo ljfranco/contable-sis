@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Layout, Menu, Button, theme, Dropdown, Space, Avatar, Spin } from 'antd';
 import {
     MenuFoldOutlined,
@@ -13,7 +13,7 @@ import {
     TransactionOutlined,
 } from '@ant-design/icons';
 import { useAuth } from '../context/AuthContext'; // Ajusta la ruta de importación si es necesario
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Footer } from 'antd/es/layout/layout';
 
@@ -30,58 +30,53 @@ export default function DashboardLayout({
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
+    const pathname = usePathname();
 
+    // Si no está autenticado y no está cargando, redirige al login
     useEffect(() => {
-        // Si no está autenticado y no está cargando, redirige al login
-        if (!loading && !isAuthenticated) {
-            router.push('/');
-        }
+        const redirectIfNotAuthenticated = () => {
+            if (!loading && !isAuthenticated) {
+                router.push('/');
+            }
+        };
+        redirectIfNotAuthenticated();
     }, [isAuthenticated, loading, router]);
 
-    // Si está cargando o no autenticado, muestra un spinner o null
-    if (loading || !isAuthenticated) {
-        return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-                <Spin size="large" tip="Verificando autenticación..." fullscreen />
-            </div>
-        );
-    }
 
-    const menuItems = [
+
+    const menuItems = useMemo(() => [
         {
-            key: '1',
+            key: '/dashboard',
             icon: <DashboardOutlined />,
             label: <Link href="/dashboard">Dashboard</Link>,
         },
         {
-            key: '2',
+            key: '/dashboard/clients',
             icon: <DollarCircleOutlined />,
             label: <Link href="/dashboard/clients">Clientes</Link>,
         },
         {
-            key: '3',
+            key: '/dashboard/companies',
             icon: <TransactionOutlined />,
-            label: <Link href="/dashboard/accounts">Cuentas</Link>,
+            label: <Link href="/dashboard/companies">Empresas</Link>,
         },
         // Agrega más ítems de menú según tus funcionalidades
-    ];
+    ], [router]);
 
-    const profileMenuItems = [
+    const goTo = (path: string) => () => router.push(path);
+
+    const profileMenuItems = useMemo(() => [
         {
             key: '1',
             label: 'Perfil',
             icon: <UserOutlined />,
-            onClick: () => {
-                router.push('/dashboard/profile');
-            }
+            onClick: goTo('/dashboard/profile')
         },
         {
             key: '2',
             label: 'Configuración',
             icon: <SettingOutlined />,
-            onClick: () => {
-                router.push('/dashboard/settings');
-            }
+            onClick: goTo('/dashboard/settings')
         },
         {
             key: '3',
@@ -92,7 +87,18 @@ export default function DashboardLayout({
                 // La redirección es manejada por AuthContext
             }
         },
-    ];
+    ], [logout, router]);
+
+    // Si está cargando o no autenticado, muestra un spinner o null
+    if (loading || !isAuthenticated) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+                <Spin size="large" tip="Verificando autenticación...">
+                    <div style={{ minHeight: 100 }} />
+                </Spin>
+            </div>
+        );
+    }
 
     return (
         <Layout style={{ minHeight: '100vh' }}>
@@ -101,7 +107,7 @@ export default function DashboardLayout({
                 <Menu
                     theme="dark"
                     mode="inline"
-                    defaultSelectedKeys={['1']}
+                    selectedKeys={[pathname]}
                     items={menuItems}
                 />
             </Sider>
@@ -118,12 +124,15 @@ export default function DashboardLayout({
                         }}
                     />
                     <Dropdown menu={{ items: profileMenuItems }} placement="bottomRight" arrow>
-                        <a onClick={(e) => e.preventDefault()} style={{ marginRight: 24 }}>
+                        <Button type="link" onClick={(e) => e.preventDefault()} style={{ marginRight: 24 }}>
                             <Space>
                                 <Avatar icon={<UserOutlined />} />
                                 <span>{user?.email || 'Usuario'}</span> {/* Muestra el email del usuario */}
+                                {/* <Avatar style={{ backgroundColor: '#87d068' }}>
+                                    {user?.email?.[0]?.toUpperCase() || 'U'}
+                                </Avatar> */}
                             </Space>
-                        </a>
+                        </Button>
                     </Dropdown>
                 </Header>
                 <Content

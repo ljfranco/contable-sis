@@ -3,12 +3,12 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../lib/supabaseClient'; // Importa tu cliente de Supabase
-import { Session } from '@supabase/supabase-js';
+import { AuthError, Session, User } from '@supabase/supabase-js';
 
 interface AuthContextType {
     isAuthenticated: boolean;
-    user: any; // Puedes tipar esto mejor con el tipo de usuario de Supabase
-    login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+    user: User | null;
+    login: (email: string, password: string) => Promise<{ success: boolean; error?: AuthError }>;
     logout: () => Promise<void>;
     loading: boolean;
 }
@@ -17,7 +17,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
@@ -25,15 +25,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (session) {
             setIsAuthenticated(true);
             setUser(session.user);
-            if (window.location.pathname === '/') { // Solo redirige si está en la página de login
-                router.push('/dashboard');
-            }
         } else {
             setIsAuthenticated(false);
             setUser(null);
-            if (window.location.pathname.startsWith('/dashboard')) { // Solo redirige si está en el dashboard
-                router.push('/');
-            }
         }
         setLoading(false);
     }, [router]);
@@ -58,7 +52,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         getInitialSession();
 
         return () => {
-            authListener.subscription.unsubscribe();
+            if (authListener?.subscription) {
+                authListener.subscription.unsubscribe();
+            }
         };
     }, [handleAuthStateChange]);
 
@@ -71,9 +67,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setLoading(false);
         if (error) {
             console.error('Error during login:', error);
-            return { success: false, error: error.message };
+            return { success: false, error: error };
         }
-        // handleAuthStateChange ya manejará la actualización del estado y la redirección
+        
         return { success: true };
     };
 
@@ -83,9 +79,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setLoading(false);
         if (error) {
             console.error('Error during logout:', error);
-            // Podrías mostrar un mensaje de error si el logout falla
         }
-        // handleAuthStateChange ya manejará la actualización del estado y la redirección
+        
     };
 
     return (

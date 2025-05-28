@@ -1,9 +1,9 @@
 'use client'
 import { Button, Checkbox, Flex, Form, Input, App, notification } from 'antd'
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface LoginFormValues {
     email: string;
@@ -13,6 +13,7 @@ interface LoginFormValues {
 
 
 export default function LoginForm() {
+    const router = useRouter();
     const { login, loading } = useAuth();
     const { message } = App.useApp();
     const [api, contextHolder] = notification.useNotification();
@@ -22,9 +23,10 @@ export default function LoginForm() {
         const { success, error } = await login(email, password);
         if (success) {
             message.success('Inicio de sesión exitoso');
-            // La redirección se maneja en AuthContext
+            router.push('/dashboard')
+
         } else {
-            message.error(error || 'Error al iniciar sesión. Verifica tus credenciales.');
+            message.error(error?.message || 'Error al iniciar sesión');
         }
     };
 
