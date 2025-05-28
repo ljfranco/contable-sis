@@ -1,61 +1,38 @@
 // components/ClientsTable.tsx
 import React, { useState, useEffect } from 'react';
-import { Spin, Alert, Button, Collapse, Descriptions, Typography, Divider, Modal, message } from 'antd'; // Importa Modal y message
-import { ReloadOutlined, EditOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons'; // Importa iconos de edición y eliminación
-import { supabase } from '../lib/supabaseClient'; // Asegúrate de que la ruta sea correcta
+import { Spin, Alert, Button, Collapse, Descriptions, Typography, Divider, Modal, message, FloatButton } from 'antd'; // Importa Modal y message
+import { ReloadOutlined, EditOutlined, DeleteOutlined, ExclamationCircleOutlined, PlusCircleOutlined } from '@ant-design/icons'; // Importa iconos de edición y eliminación
+import { supabase } from '../../lib/supabaseClient'; // Asegúrate de que la ruta sea correcta
+import { Client } from '@/app/types/clients';
+import { getClients } from '@/app/lib/queries/clients/getClients';
+import EditClientModal from './EditClientModal';
 
 const { Text } = Typography;
 const { confirm } = Modal; // Para el modal de confirmación de eliminación
-
-// Define el tipo para un cliente con el campo anidado de document_types
-interface Client {
-    id_client: string;
-    full_name: string;
-    document_number: string;
-    email: string | null;
-    phone: string | null;
-    address: string | null;
-    created_at: string;
-    updated_at: string | null;
-    document_types: {
-        name: string;
-    } | null;
-}
 
 const ClientsTable: React.FC = () => {
     const [clients, setClients] = useState<Client[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [deleting, setDeleting] = useState<boolean>(false); // Nuevo estado para indicar si se está eliminando
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+
+
 
     const fetchClients = async () => {
         setLoading(true);
         setError(null);
         try {
-            const { data, error } = await supabase
-                .from('clients')
-                .select(`
-                    id_client,
-                    full_name,
-                    document_number,
-                    email,
-                    phone,
-                    address,
-                    created_at,
-                    updated_at,
-                    document_types (name)
-                `);
-
-            if (error) {
-                throw error;
-            }
-            setClients(data as Client[]);
+            const data = await getClients();
+            setClients(data);
         } catch (err: any) {
-            console.error("Error fetching clients:", err.message);
-            setError("Error al cargar los clientes: " + err.message);
+            console.error(err);
+            setError(err.message || 'Error inesperado');
         } finally {
             setLoading(false);
         }
+
     };
 
     useEffect(() => {
@@ -63,12 +40,18 @@ const ClientsTable: React.FC = () => {
     }, []);
 
     const handleEditClient = (clientId: string, event: React.MouseEvent) => {
-        event.stopPropagation(); // Evita que se colapse/despliegue el panel del Collapse
-        message.info(`Editar cliente con ID: ${clientId}`);
+        event.stopPropagation();
+        const client = clients.find(c => c.id_client === clientId);
+        if (client) {
+            setSelectedClient(client);
+            setIsEditModalOpen(true);
+        }
+
         // Aquí puedes agregar la lógica para editar, por ejemplo:
         // - Abrir un modal con un formulario prellenado para editar el cliente.
         // - Redirigir a una página de edición: router.push(`/dashboard/clients/edit/${clientId}`);
     };
+
 
     const handleDeleteClient = (clientId: string, event: React.MouseEvent) => {
         event.stopPropagation(); // Evita que se colapse/despliegue el panel del Collapse
@@ -177,6 +160,7 @@ const ClientsTable: React.FC = () => {
         ),
     }));
 
+
     return (
         <div>
             <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'flex-end' }}>
@@ -189,8 +173,30 @@ const ClientsTable: React.FC = () => {
                     Refrescar Clientes
                 </Button>
             </div>
+            <EditClientModal
+                open={isEditModalOpen}
+                onClose={() => {
+                    setIsEditModalOpen(false);
+                    setSelectedClient(null);
+                }}
+                client={selectedClient}
+                onUpdate={fetchClients}
+            />
             {/* Pasamos el array de items a la prop 'items' del Collapse */}
             <Collapse accordion items={collapseItems} />
+
+            <FloatButton
+                icon= {<PlusCircleOutlined />}
+                type = "primary"
+                style={{ insetBlockEnd: 108 }}
+                onClick={() => console.log('Nuevo Cliente')}
+                tooltip={{
+                    title: 'Nuevo Cliente',
+                    color: 'blue',
+                    placement: 'top',
+                }}
+            />
+            
         </div>
     );
 };

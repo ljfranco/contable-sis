@@ -2,7 +2,7 @@
 "use client"
 import { Menu } from "antd";
 import SubMenu from "antd/es/menu/SubMenu";
-import ClientsTable from "../components/ClientsTable";
+import ClientsTable from "../components/clients/ClientsTable";
 
 export default function Dashboard() {
     return (

@@ -24,7 +24,7 @@ export default function Home() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <Spin size="large" tip="Cargando sesión..." />
+        <Spin size="large" fullscreen />
       </div>
     );
   }
