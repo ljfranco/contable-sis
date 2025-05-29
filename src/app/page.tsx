@@ -1,13 +1,3 @@
-// import LoginForm from "./components/loginForm";
-
-// export default function Home() {
-//   return (
-//     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-//       <LoginForm />
-//     </div>
-//   );
-// }
-
 'use client';
 
 import { useEffect } from 'react';
@@ -36,8 +26,10 @@ export default function Home() {
 
   // Si no está autenticado y no está cargando, muestra el formulario de login
   return (
+    <div  style={{ backgroundImage: 'url("/mainbackground.png")', backgroundSize: 'cover', height: '100vh' }}>
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
       <LoginForm />
+    </div>
     </div>
   );
 }

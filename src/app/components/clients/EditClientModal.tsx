@@ -53,6 +53,7 @@ const EditClientModal: React.FC<EditClientModalProps> = ({ open, onClose, client
             onOk={handleSave}
             okText="Guardar"
             cancelText="Cancelar"
+            destroyOnHidden={true}
         >
             <Form layout="vertical" form={form}>
                 <Form.Item name="full_name" label="Nombre completo" rules={[{ required: true }]}>

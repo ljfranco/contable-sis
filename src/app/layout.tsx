@@ -1,8 +1,10 @@
 import '@ant-design/v5-patch-for-react-19';
+import './globals.css';
 import type { Metadata } from 'next';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
-import { ConfigProvider, App } from 'antd';
 import { AuthProvider } from './context/AuthContext';
+import { AntdThemeProvider } from './components/AntdThemeProvider';
+import { App } from 'antd';
 
 export const metadata: Metadata = {
   title: 'ContableSis',
@@ -18,11 +20,11 @@ export default function RootLayout({
     <html lang="en">
       <body suppressHydrationWarning={true}>
         <AntdRegistry>
-          <ConfigProvider>
+          <AntdThemeProvider>
             <App>
               <AuthProvider>{children}</AuthProvider>
             </App>
-          </ConfigProvider>
+          </AntdThemeProvider>
         </AntdRegistry>
       </body>
     </html>

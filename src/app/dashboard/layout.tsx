@@ -11,6 +11,8 @@ import {
     LogoutOutlined,
     DollarCircleOutlined,
     TransactionOutlined,
+    TeamOutlined,
+    ShopOutlined,
 } from '@ant-design/icons';
 import { useAuth } from '../context/AuthContext'; // Ajusta la ruta de importación si es necesario
 import { usePathname, useRouter } from 'next/navigation';
@@ -52,12 +54,12 @@ export default function DashboardLayout({
         },
         {
             key: '/dashboard/clients',
-            icon: <DollarCircleOutlined />,
+            icon: <TeamOutlined />,
             label: <Link href="/dashboard/clients">Clientes</Link>,
         },
         {
             key: '/dashboard/companies',
-            icon: <TransactionOutlined />,
+            icon: <ShopOutlined />,
             label: <Link href="/dashboard/companies">Empresas</Link>,
         },
         // Agrega más ítems de menú según tus funcionalidades
@@ -93,7 +95,7 @@ export default function DashboardLayout({
     if (loading || !isAuthenticated) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-                <Spin size="large" tip="Verificando autenticación...">
+                <Spin size="large" tip="Verificando autenticación..." fullscreen >
                     <div style={{ minHeight: 100 }} />
                 </Spin>
             </div>

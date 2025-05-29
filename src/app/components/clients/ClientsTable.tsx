@@ -1,7 +1,7 @@
 // components/ClientsTable.tsx
 import React, { useState, useEffect } from 'react';
 import { Spin, Alert, Button, Collapse, Descriptions, Typography, Divider, Modal, message, FloatButton } from 'antd'; // Importa Modal y message
-import { ReloadOutlined, EditOutlined, DeleteOutlined, ExclamationCircleOutlined, PlusCircleOutlined } from '@ant-design/icons'; // Importa iconos de edición y eliminación
+import { ReloadOutlined, EditOutlined, DeleteOutlined, ExclamationCircleOutlined, PlusCircleOutlined, UserAddOutlined } from '@ant-design/icons'; // Importa iconos de edición y eliminación
 import { supabase } from '../../lib/supabaseClient'; // Asegúrate de que la ruta sea correcta
 import { Client } from '@/app/types/clients';
 import { getClients } from '@/app/lib/queries/clients/getClients';
@@ -186,7 +186,7 @@ const ClientsTable: React.FC = () => {
             <Collapse accordion items={collapseItems} />
 
             <FloatButton
-                icon= {<PlusCircleOutlined />}
+                icon= {<UserAddOutlined />}
                 type = "primary"
                 style={{ insetBlockEnd: 108 }}
                 onClick={() => console.log('Nuevo Cliente')}
