@@ -9,6 +9,14 @@ export interface Client {
     created_at: string;
     updated_at: string | null;
     document_types: {
+        id_doc_type: string;
         name: string;
     } | null;
 }
+
+export interface document_types {
+    id_doc_type: string;
+    name: string;
+}
+
+

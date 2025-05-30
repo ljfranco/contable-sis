@@ -21,9 +21,7 @@ export default function RootLayout({
       <body suppressHydrationWarning={true}>
         <AntdRegistry>
           <AntdThemeProvider>
-            <App>
-              <AuthProvider>{children}</AuthProvider>
-            </App>
+            <AuthProvider>{children}</AuthProvider>
           </AntdThemeProvider>
         </AntdRegistry>
       </body>

@@ -10,6 +10,12 @@ export default function Home() {
   const { isAuthenticated, loading } = useAuth(); // Obtén también 'loading' del contexto
   const router = useRouter();
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/dashboard');
+    }
+  }, [isAuthenticated, router]);
+
   // Si loading es true, muestra un spinner
   if (loading) {
     return (
@@ -18,10 +24,9 @@ export default function Home() {
       </div>
     );
   }
-
-  // Si ya está autenticado, no renderizamos el login, AuthContext ya manejará la redirección
+  // Para prevenir el render del Login form si el usuario ya está autenticado
   if (isAuthenticated) {
-    return null; // O podrías retornar un spinner mientras el AuthContext redirige
+    return null;
   }
 
   // Si no está autenticado y no está cargando, muestra el formulario de login
